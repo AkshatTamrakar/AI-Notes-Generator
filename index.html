@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Note Generator</title>
+</head>
+<body>
+    <h1>AI Note Generator</h1>
+    <form id="noteForm">
+        <label for="subject">Subject:</label>
+        <input type="text" id="subject" name="subject" required><br><br>
+
+        <label for="gradeLevel">Grade Level:</label>
+        <input type="text" id="gradeLevel" name="gradeLevel" required><br><br>
+
+        <label for="topic">Topic:</label>
+        <textarea id="topic" name="topic" required></textarea><br><br>
+
+        <button type="submit">Generate Notes</button>
+    </form>
+
+    <div id="notesOutput"></div>
+
+    <script>
+        const noteForm = document.getElementById('noteForm');
+        const notesOutput = document.getElementById('notesOutput');
+
+        noteForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const formData = new FormData(noteForm);
+            const subject = formData.get('subject');
+            const gradeLevel = formData.get('gradeLevel');
+            const topic = formData.get('topic');
+
+            try {
+                const response = await fetch('/generate-notes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ subject, gradeLevel, topic }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    notesOutput.innerHTML = `<pre>${data.notes}</pre>`; // Use <pre> for preserving formatting
+                } else {
+                    notesOutput.innerHTML = `<p>Error: ${data.error}</p>`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                notesOutput.innerHTML = error;
+            }
+        });
+    </script>
+</body>
+</html>
